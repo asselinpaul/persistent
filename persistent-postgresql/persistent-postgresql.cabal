@@ -1,5 +1,5 @@
 name:               persistent-postgresql
-version:            2.14.3.0
+version:            2.14.3.1
 license:            MIT
 license-file:       LICENSE
 author:             Felipe Lessa, Michael Snoyman <michael@snoyman.com>
@@ -68,6 +68,7 @@ test-suite test
     MigrationSpec
     PgInit
     PgIntervalTest
+    ResultErrorSpec
     UpsertWhere
 
   ghc-options:      -Wall
@@ -88,6 +89,7 @@ test-suite test
     , persistent-postgresql
     , persistent-qq
     , persistent-test
+    , postgresql-simple
     , postgresql-simple-interval
     , QuickCheck
     , quickcheck-instances

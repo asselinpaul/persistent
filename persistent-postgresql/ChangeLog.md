@@ -1,5 +1,12 @@
 # Changelog for persistent-postgresql
 
+# 2.14.3.1
+
+* [#1645](https://github.com/yesodweb/persistent/pull/1645)
+  * Fix a use-after-free when a column fails to decode. The `ResultError`'s
+    table OID and column name were read lazily from a result that had already
+    been freed, so inspecting the error could return wrong values or segfault.
+
 # 2.14.3.0
 
 * [#1616](https://github.com/yesodweb/persistent/pull/1616)

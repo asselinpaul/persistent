@@ -57,6 +57,7 @@ import qualified RawSqlTest
 import qualified ReadWriteTest
 import qualified Recursive
 import qualified RenameTest
+import qualified ResultErrorSpec
 import qualified SumTypeTest
 import qualified TransactionLevelTest
 import qualified TreeTest
@@ -225,4 +226,5 @@ main = do
         UpsertWhere.specs
         PgIntervalTest.specs
         ArrayAggTest.specs
+        ResultErrorSpec.spec
         GeneratedColumnTestSQL.specsWith runConnAssert

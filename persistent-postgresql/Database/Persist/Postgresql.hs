@@ -76,7 +76,13 @@ import Database.PostgreSQL.Simple.Ok (Ok (..))
 import qualified Database.PostgreSQL.Simple.Transaction as PG
 import qualified Database.PostgreSQL.Simple.Types as PG
 
-import Control.Exception (Exception, throw, throwIO)
+import Control.Exception
+    ( Exception
+    , SomeException
+    , evaluate
+    , fromException
+    , throwIO
+    )
 import Control.Monad
 import Control.Monad.Except
 import Control.Monad.IO.Unlift (MonadIO (..), MonadUnliftIO)
@@ -678,9 +684,20 @@ withStmt' conn query vals =
                     Just bs -> do
                         ok <- PGFF.runConversion (getter mbs) conn
                         bs `seq` case ok of
-                            Errors (exc : _) -> throw exc
+                            Errors (exc : _) -> throwConversionError exc
                             Errors [] -> error "Got an Errors, but no exceptions"
                             Ok v -> return v
+
+-- | A 'PGFF.ResultError' reads its table OID and column name lazily from the
+-- result it was decoded from. 'withStmt'' frees that result with
+-- 'LibPQ.unsafeFreeResult' while the error is still propagating, so read those
+-- fields before throwing; inspecting them afterwards reads freed memory.
+throwConversionError :: SomeException -> IO a
+throwConversionError exc = do
+    forM_ (fromException exc) $ \err -> do
+        _ <- evaluate (PGFF.errSQLTableOid err)
+        evaluate (length (PGFF.errSQLField err))
+    throwIO exc
 
 migrate'
     :: BackendSpecificOverrides
